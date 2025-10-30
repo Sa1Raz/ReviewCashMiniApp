@@ -291,9 +291,13 @@
         let currentRole = null;
         let userData = { balance: 0, tasks: 0, income: 0, rating: 5.0, transactions: [], username: "@YourUsername" };
 
+        console.log("Script loaded, Telegram.WebApp ready check...");
+
         function setRole(role) {
             currentRole = role;
-            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+            const data = JSON.stringify({ action: "set_role", role: role });
+            Telegram.WebApp.sendData(data);
+            console.log("setRole called, sending:", data);
             switchTab('tasksPanel');
             updatePanelVisibility();
             logDebug(`Role set to: ${role}`);
@@ -305,36 +309,41 @@
             document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`.tab-button[onclick="switchTab('${panelId}')"]`).classList.add('active');
             updatePanelVisibility();
+            console.log(`Switched to panel: ${panelId}`);
             logDebug(`Switched to panel: ${panelId}`);
         }
 
         function sendAction(action) {
-            if (currentRole) {
-                const data = JSON.stringify({ action: action, role: currentRole });
-                Telegram.WebApp.sendData(data);
-                logDebug(`Sent action: ${action}, Data: ${data}`);
-                if (action === 'recharge' || action === 'withdraw' || action === 'settings') {
-                    switchTab('profilePanel');
-                } else if (action === 'create_task' || action === 'view_tasks') {
-                    Telegram.WebApp.close();
-                }
-            } else {
+            if (!currentRole) {
+                console.error("No role set, cannot send action.");
                 logDebug("No role set, action not sent.");
+                return;
+            }
+            const data = JSON.stringify({ action: action, role: currentRole });
+            console.log("Sending action:", action, "with data:", data);
+            Telegram.WebApp.sendData(data);
+            logDebug(`Sent action: ${action}, Data: ${data}`);
+            if (action === 'recharge' || action === 'withdraw' || action === 'settings') {
+                switchTab('profilePanel');
+            } else if (action === 'create_task' || action === 'view_tasks') {
+                Telegram.WebApp.close();
             }
         }
 
         function updatePanelVisibility() {
             const createTaskBtn = document.getElementById('createTaskBtn');
             const viewTasksBtn = document.getElementById('viewTasksBtn');
-            if (currentRole === 'employer') {
-                createTaskBtn.classList.remove('hidden');
+            if (createTaskBtn && viewTasksBtn) {
+                if (currentRole === 'employer') {
+                    createTaskBtn.classList.remove('hidden');
+                    viewTasksBtn.classList.add('hidden');
+                } else if (currentRole === 'worker') {
+                    createTaskBtn.classList.add('hidden');
+                    viewTasksBtn.classList.remove('hidden');
+                }
+                console.log(`Panel visibility updated for role: ${currentRole}`);
             } else {
-                createTaskBtn.classList.add('hidden');
-            }
-            if (currentRole === 'worker') {
-                viewTasksBtn.classList.remove('hidden');
-            } else {
-                viewTasksBtn.classList.add('hidden');
+                console.error("Button elements not found:", { createTaskBtn, viewTasksBtn });
             }
             updateUI();
         }
@@ -359,13 +368,18 @@
 
         function logDebug(message) {
             const debugLog = document.getElementById('debugLog');
-            debugLog.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
-            debugLog.scrollTop = debugLog.scrollHeight;
+            if (debugLog) {
+                debugLog.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
+                debugLog.scrollTop = debugLog.scrollHeight;
+            } else {
+                console.error("Debug log element not found.");
+            }
         }
 
         // Обработка обновлений от бота
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
+            console.log("Received web_app_data:", data);
             logDebug(`Received data: ${JSON.stringify(data)}`);
             if (data.action === "update_profile") {
                 userData.balance = data.balance || 0;
@@ -374,13 +388,22 @@
                 userData.rating = data.rating || 5.0;
                 userData.transactions = data.transactions || [];
                 updateUI();
+                console.log("Profile updated:", userData);
             }
         });
 
         // Инициализация
-        Telegram.WebApp.ready();
-        Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, initializing...");
+            if (Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                console.log("Telegram.WebApp initialized.");
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
+                console.log("Sent initial get_profile request.");
+            } else {
+                console.error("Telegram.WebApp is not available.");
+            }
+        });
     </script>
 </body>
 </html>
-
