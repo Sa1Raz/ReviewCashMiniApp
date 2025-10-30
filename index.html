@@ -220,8 +220,8 @@
         <div id="tasksPanel" class="panel active">
             <h2>Ваши задания</h2>
             <div id="taskList"></div>
-            <button class="action-btn" onclick="sendAction('create_task')">📝 Создать задачу</button>
-            <button class="action-btn" onclick="sendAction('view_tasks')">📋 Все задания</button>
+            <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
+            <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
         </div>
 
         <div id="profilePanel" class="panel">
@@ -324,10 +324,17 @@
         }
 
         function updatePanelVisibility() {
+            const createTaskBtn = document.getElementById('createTaskBtn');
+            const viewTasksBtn = document.getElementById('viewTasksBtn');
             if (currentRole === 'employer') {
-                document.getElementById('createTaskBtn').classList.remove('hidden');
-            } else if (currentRole === 'worker') {
-                document.getElementById('viewTasksBtn').classList.remove('hidden');
+                createTaskBtn.classList.remove('hidden');
+            } else {
+                createTaskBtn.classList.add('hidden');
+            }
+            if (currentRole === 'worker') {
+                viewTasksBtn.classList.remove('hidden');
+            } else {
+                viewTasksBtn.classList.add('hidden');
             }
             updateUI();
         }
@@ -376,4 +383,3 @@
     </script>
 </body>
 </html>
-
