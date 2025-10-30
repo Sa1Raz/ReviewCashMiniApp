@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReviewCash Mini App</title>
+    <title>ReviewCash</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: #1a1a2e;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: #fff;
             overflow-x: hidden;
             display: flex;
@@ -24,108 +24,55 @@
         }
         h1 {
             text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 28px;
+            margin-bottom: 30px;
             color: #00d4ff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        .panel {
+        .role-selection {
+            text-align: center;
+            margin-bottom: 30px;
             display: none;
         }
-        .panel.active {
+        .role-selection.active {
             display: block;
         }
-        .profile-section {
-            text-align: center;
+        .role-btn {
+            display: block;
+            width: 100%;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin-bottom: 20px;
-        }
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 10px;
-            background: #fff;
-            overflow: hidden;
-        }
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .username {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00ffcc;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #ccc;
-        }
-        .action-btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: linear-gradient(90deg, #00cc00, #009900);
-            color: #fff;
+            margin: 15px 0;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 15px;
+            font-size: 18px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 204, 0, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 204, 0, 0.4);
-        }
-        .action-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(0, 204, 0, 0.2);
-        }
-        .withdraw-btn {
-            background: linear-gradient(90deg, #ff4444, #cc0000);
-        }
-        .withdraw-btn:hover {
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
-        }
-        .withdraw-btn:active {
-            box-shadow: 0 2px 10px rgba(255, 68, 68, 0.2);
-        }
-        .balance-display {
-            font-size: 24px;
-            color: #00ffcc;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .transaction-list {
-            margin: 10px 0;
-        }
-        .transaction-item {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-bottom: 5px;
+            align-items: center;
+            justify-content: center;
         }
-        .transaction-amount {
-            color: #00cc00;
-            font-weight: bold;
+        .role-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .role-btn.worker {
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+        }
+        .role-btn.worker:hover {
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
+        }
+        .role-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .main-app {
+            display: none;
+        }
+        .main-app.active {
+            display: block;
         }
         .tabs {
             display: flex;
@@ -157,43 +104,93 @@
             font-size: 20px;
             margin-bottom: 5px;
         }
+        .panel {
+            display: none;
+        }
+        .panel.active {
+            display: block;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 15px;
+        }
+        .balance {
+            font-size: 26px;
+            color: #ffd700;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: linear-gradient(90deg, #00cc00, #009900);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 204, 0, 0.3);
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 204, 0, 0.4);
+        }
+        .withdraw-btn {
+            background: linear-gradient(90deg, #ff4444, #cc0000);
+        }
+        .withdraw-btn:hover {
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+        .transaction-amount {
+            color: #00cc00;
+            font-weight: bold;
+        }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
     <div class="container">
-        <h1>ReviewCash</h1>
-
-        <div id="tasksPanel" class="panel active">
-            <h2>Ваши задания</h2>
-            <div id="taskList"></div>
-            <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
-            <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
+        <!-- Экран выбора роли -->
+        <div id="roleSelection" class="role-selection">
+            <h1>Выберите роль</h1>
+            <button class="role-btn" onclick="setRole('employer')">
+                <span class="role-icon">👤</span> Работодатель
+            </button>
+            <button class="role-btn worker" onclick="setRole('worker')">
+                <span class="role-icon">🛠️</span> Исполнитель
+            </button>
         </div>
 
-        <div id="profilePanel" class="panel">
-            <div class="profile-section">
-                <div class="avatar" id="avatar"><img src="" alt="Avatar"></div>
-                <div class="username" id="username">@YourUsername</div>
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-number" id="tasksCount">0</div>
-                        <div class="stat-label">Задач</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="income">0 Р</div>
-                        <div class="stat-label">Доход</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="rating">5.0</div>
-                        <div class="stat-label">Рейтинг</div>
-                    </div>
-                </div>
+        <!-- Основной интерфейс -->
+        <div id="mainApp" class="main-app">
+            <div id="tasksPanel" class="panel active">
+                <h2>Задания</h2>
+                <div id="taskList"></div>
+                <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
+                <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
             </div>
-            <div class="balance-display" id="balance">Баланс: 0 Р</div>
-            <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
-            <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
-            <div class="transaction-list" id="transactionList"></div>
+
+            <div id="profilePanel" class="panel">
+                <h2>Профиль</h2>
+                <div class="balance" id="balance">Баланс: 0 Р</div>
+                <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
+                <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
+                <button class="action-btn" onclick="showRoleSelection()">🔄 Сменить роль</button>
+                <div class="transaction-list" id="transactionList"></div>
+            </div>
         </div>
     </div>
 
@@ -211,28 +208,45 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let currentRole = null;
-        let userData = { balance: 0, tasks: 0, income: 0, rating: 5.0, transactions: [], username: "@YourUsername" };
 
-        // Инициализация
+        // Проверка роли при загрузке
         document.addEventListener('DOMContentLoaded', () => {
-            if (Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                const user = Telegram.WebApp.initDataUnsafe.user;
-                if (user) {
-                    document.getElementById('username').textContent = user.username || `@${user.id}`;
-                    const avatarUrl = user.photo_url || '';
-                    if (avatarUrl) {
-                        document.getElementById('avatar').querySelector('img').src = avatarUrl;
-                    }
+            Telegram.WebApp.ready();
+            Telegram.WebApp.sendData(JSON.stringify({ action: "get_role" }));
+        });
+
+        // Обработка данных от бота
+        Telegram.WebApp.onEvent('web_app_data', function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "set_role_response" || data.action === "get_role_response") {
+                currentRole = data.role;
+                if (currentRole) {
+                    document.getElementById('roleSelection').classList.remove('active');
+                    document.getElementById('mainApp').classList.add('active');
+                    updatePanelVisibility();
+                } else {
+                    document.getElementById('roleSelection').classList.add('active');
                 }
-                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
             }
         });
 
+        function setRole(role) {
+            currentRole = role;
+            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+            document.getElementById('roleSelection').classList.remove('active');
+            document.getElementById('mainApp').classList.add('active');
+            updatePanelVisibility();
+        }
+
+        function showRoleSelection() {
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('roleSelection').classList.add('active');
+        }
+
         function switchTab(panelId) {
-            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
-            document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
             document.querySelector(`.tab-button[onclick="switchTab('${panelId}')"]`).classList.add('active');
         }
 
@@ -241,67 +255,25 @@
                 alert("Сначала выберите роль!");
                 return;
             }
-            const data = JSON.stringify({ action: action, role: currentRole });
-            Telegram.WebApp.sendData(data);
+            Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
             if (action === 'recharge' || action === 'withdraw') {
                 switchTab('profilePanel');
-            } else if (action === 'create_task' || action === 'view_tasks') {
-                switchTab('tasksPanel');
             }
-        }
-
-        function setRole(role) {
-            currentRole = role;
-            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            updatePanelVisibility();
         }
 
         function updatePanelVisibility() {
-            const createTaskBtn = document.getElementById('createTaskBtn');
-            const viewTasksBtn = document.getElementById('viewTasksBtn');
-            if (createTaskBtn && viewTasksBtn) {
+            const createBtn = document.getElementById('createTaskBtn');
+            const viewBtn = document.getElementById('viewTasksBtn');
+            if (createBtn && viewBtn) {
                 if (currentRole === 'employer') {
-                    createTaskBtn.style.display = 'block';
-                    viewTasksBtn.style.display = 'none';
+                    createBtn.style.display = 'block';
+                    viewBtn.style.display = 'none';
                 } else if (currentRole === 'worker') {
-                    createTaskBtn.style.display = 'none';
-                    viewTasksBtn.style.display = 'block';
+                    createBtn.style.display = 'none';
+                    viewBtn.style.display = 'block';
                 }
             }
         }
-
-        function updateUI(data) {
-            userData.balance = data.balance || 0;
-            userData.tasks = data.tasks_completed || 0;
-            userData.income = data.income || 0;
-            userData.rating = data.rating || 5.0;
-            userData.transactions = data.transactions || [];
-
-            document.getElementById('balance').textContent = `Баланс: ${userData.balance} Р`;
-            document.getElementById('tasksCount').textContent = userData.tasks;
-            document.getElementById('income').textContent = `${userData.income} Р`;
-            document.getElementById('rating').textContent = userData.rating;
-            document.getElementById('transactionList').innerHTML = userData.transactions.map(t => `
-                <div class="transaction-item">
-                    <span>${t.type}</span>
-                    <span class="transaction-amount">${t.amount} Р</span>
-                </div>
-            `).join('');
-        }
-
-        // Обработка данных от бота
-        Telegram.WebApp.onEvent('web_app_data', function(event) {
-            const data = JSON.parse(event.data);
-            if (data.action === "update_profile") {
-                updateUI(data);
-            } else if (data.action === "set_role_response") {
-                updatePanelVisibility();
-            } else if (data.action === "task_created") {
-                alert("Задача создана!");
-            } else if (data.action === "task_completed") {
-                alert("Задача выполнена! Средства зачислены.");
-            }
-        });
     </script>
 </body>
 </html>
