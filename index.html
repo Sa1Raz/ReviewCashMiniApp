@@ -293,6 +293,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (Telegram.WebApp) {
                 Telegram.WebApp.ready();
+                console.log("Telegram WebApp initialized");
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
                     document.getElementById('username').textContent = user.username || `@${user.id}`;
@@ -302,26 +303,33 @@
                     }
                 }
                 Telegram.WebApp.sendData(JSON.stringify({ action: "get_role" }));
+                console.log("Sent get_role request");
+            } else {
+                console.error("Telegram WebApp not available");
             }
         });
 
         // Обработка данных от бота
         Telegram.WebApp.onEvent('web_app_data', function(event) {
+            console.log("Received data:", event.data);
             const data = JSON.parse(event.data);
             if (data.action === "get_role_response") {
                 currentRole = data.role;
                 if (!currentRole) {
                     document.getElementById('roleSelection').classList.add('active');
+                    console.log("No role, showing selection");
                 } else {
                     document.getElementById('roleSelection').classList.remove('active');
                     document.getElementById('mainApp').classList.add('active');
                     updatePanelVisibility();
+                    console.log("Role set to:", currentRole);
                 }
             } else if (data.action === "set_role_response") {
                 currentRole = data.role;
                 document.getElementById('roleSelection').classList.remove('active');
                 document.getElementById('mainApp').classList.add('active');
                 updatePanelVisibility();
+                console.log("Role set to:", currentRole);
             } else if (data.action === "update_profile") {
                 updateUI(data);
             } else if (data.action === "task_created") {
@@ -331,16 +339,28 @@
             } else if (data.action === "show_role_selection") {
                 document.getElementById('mainApp').classList.remove('active');
                 document.getElementById('roleSelection').classList.add('active');
+                console.log("Showing role selection");
             }
         });
 
         function setRole(role) {
-            currentRole = role;
-            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+            console.log("setRole called with:", role);
+            if (Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+                console.log("Sent set_role request for:", role);
+            } else {
+                console.error("Telegram WebApp not initialized");
+            }
         }
 
         function showRoleSelection() {
-            Telegram.WebApp.sendData(JSON.stringify({ action: "show_role_selection" }));
+            console.log("showRoleSelection called");
+            if (Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({ action: "show_role_selection" }));
+                console.log("Sent show_role_selection request");
+            } else {
+                console.error("Telegram WebApp not initialized");
+            }
         }
 
         function switchTab(panelId) {
@@ -355,7 +375,13 @@
                 alert("Сначала выберите роль!");
                 return;
             }
-            Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
+            console.log("sendAction called with:", action);
+            if (Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
+                console.log("Sent action:", action);
+            } else {
+                console.error("Telegram WebApp not initialized");
+            }
             if (action === 'recharge' || action === 'withdraw') {
                 switchTab('profilePanel');
             } else if (action === 'create_task' || action === 'view_tasks') {
