@@ -15,7 +15,6 @@
             overflow-x: hidden;
             position: relative;
         }
-        /* Космос с звёздами */
         body::before {
             content: '';
             position: absolute;
@@ -55,6 +54,45 @@
         }
         .panel.active {
             display: block;
+        }
+        .role-selection {
+            text-align: center;
+            margin: 0 auto;
+            display: none;
+        }
+        .role-selection.active {
+            display: block;
+        }
+        .role-btn {
+            display: block;
+            width: 80%;
+            padding: 15px;
+            margin: 15px auto;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .role-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+        .role-btn.worker {
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+        }
+        .role-btn.worker:hover {
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
+        }
+        .role-icon {
+            font-size: 24px;
+            margin-right: 10px;
         }
         .profile-section {
             text-align: center;
@@ -185,39 +223,51 @@
 </head>
 <body>
     <div class="container">
-        <h1>ReviewCash</h1>
-
-        <div id="tasksPanel" class="panel active">
-            <h2>Ваши задания</h2>
-            <div id="taskList"></div>
-            <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
-            <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
+        <!-- Экран выбора роли -->
+        <div id="roleSelection" class="role-selection">
+            <h1>Выберите роль</h1>
+            <button class="role-btn" onclick="setRole('employer')">
+                <span class="role-icon">👤</span> Работодатель
+            </button>
+            <button class="role-btn worker" onclick="setRole('worker')">
+                <span class="role-icon">🛠️</span> Исполнитель
+            </button>
         </div>
 
-        <div id="profilePanel" class="panel">
-            <div class="profile-section">
-                <div class="avatar" id="avatar"><img src="" alt="Avatar"></div>
-                <div class="username" id="username">@YourUsername</div>
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-number" id="tasksCount">0</div>
-                        <div class="stat-label">Задач</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="income">0 Р</div>
-                        <div class="stat-label">Доход</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="rating">5.0</div>
-                        <div class="stat-label">Рейтинг</div>
+        <!-- Основной интерфейс -->
+        <div id="mainApp" class="panel">
+            <div id="tasksPanel" class="panel active">
+                <h2>Ваши задания</h2>
+                <div id="taskList"></div>
+                <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
+                <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
+            </div>
+
+            <div id="profilePanel" class="panel">
+                <div class="profile-section">
+                    <div class="avatar" id="avatar"><img src="" alt="Avatar"></div>
+                    <div class="username" id="username">@YourUsername</div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="tasksCount">0</div>
+                            <div class="stat-label">Задач</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="income">0 Р</div>
+                            <div class="stat-label">Доход</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="rating">5.0</div>
+                            <div class="stat-label">Рейтинг</div>
+                        </div>
                     </div>
                 </div>
+                <div class="balance-display" id="balance">Баланс: 0 Р</div>
+                <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
+                <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
+                <button class="action-btn" onclick="showRoleSelection()">🔄 Сменить роль</button>
+                <div class="transaction-list" id="transactionList"></div>
             </div>
-            <div class="balance-display" id="balance">Баланс: 0 Р</div>
-            <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
-            <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
-            <button class="action-btn" onclick="showRoleSelection()">🔄 Сменить роль</button>
-            <div class="transaction-list" id="transactionList"></div>
         </div>
     </div>
 
@@ -249,9 +299,48 @@
                         document.getElementById('avatar').querySelector('img').src = avatarUrl;
                     }
                 }
-                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_role" }));
             }
         });
+
+        // Обработка данных от бота
+        Telegram.WebApp.onEvent('web_app_data', function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "get_role_response") {
+                currentRole = data.role;
+                if (!currentRole) {
+                    document.getElementById('roleSelection').classList.add('active');
+                    document.getElementById('mainApp').classList.remove('active');
+                } else {
+                    document.getElementById('roleSelection').classList.remove('active');
+                    document.getElementById('mainApp').classList.add('active');
+                    updatePanelVisibility();
+                }
+            } else if (data.action === "set_role_response") {
+                currentRole = data.role;
+                document.getElementById('roleSelection').classList.remove('active');
+                document.getElementById('mainApp').classList.add('active');
+                updatePanelVisibility();
+            } else if (data.action === "update_profile") {
+                updateUI(data);
+            } else if (data.action === "task_created") {
+                alert("Задача создана!");
+            } else if (data.action === "task_completed") {
+                alert("Задача выполнена! Средства зачислены.");
+            } else if (data.action === "show_role_selection") {
+                document.getElementById('mainApp').classList.remove('active');
+                document.getElementById('roleSelection').classList.add('active');
+            }
+        });
+
+        function setRole(role) {
+            currentRole = role;
+            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+        }
+
+        function showRoleSelection() {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "show_role_selection" }));
+        }
 
         function switchTab(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -271,17 +360,6 @@
             } else if (action === 'create_task' || action === 'view_tasks') {
                 switchTab('tasksPanel');
             }
-        }
-
-        function setRole(role) {
-            currentRole = role;
-            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            updatePanelVisibility();
-        }
-
-        function showRoleSelection() {
-            Telegram.WebApp.sendData(JSON.stringify({ action: "show_role_selection" }));
-            switchTab('tasksPanel');
         }
 
         function updatePanelVisibility() {
@@ -316,20 +394,6 @@
                 </div>
             `).join('');
         }
-
-        // Обработка данных от бота
-        Telegram.WebApp.onEvent('web_app_data', function(event) {
-            const data = JSON.parse(event.data);
-            if (data.action === "update_profile") {
-                updateUI(data);
-            } else if (data.action === "set_role_response") {
-                updatePanelVisibility();
-            } else if (data.action === "task_created") {
-                alert("Задача создана!");
-            } else if (data.action === "task_completed") {
-                alert("Задача выполнена! Средства зачислены.");
-            }
-        });
     </script>
 </body>
 </html>
