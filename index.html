@@ -10,9 +10,26 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at 20% 20%, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: #fff;
             overflow-x: hidden;
+            position: relative;
+        }
+        /* Эффект звёзд */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNkYGD4z8DAwMDAwMDP9//8PAwP///z8AAMABQCRnT7K/gAAAABJRU5ErkJggg==") repeat;
+            opacity: 0.05;
+            animation: twinkle 5s infinite alternate;
+        }
+        @keyframes twinkle {
+            from { opacity: 0.05; }
+            to { opacity: 0.15; }
         }
         .container {
             max-width: 400px;
@@ -21,36 +38,13 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        h1 {
+            text-align: center;
+            font-size: 24px;
             margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-        }
-        .logo {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .action-btn {
-            padding: 8px 16px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .action-btn:hover {
-            background: #45a049;
         }
         .profile-section {
             text-align: center;
@@ -132,6 +126,32 @@
         .panel.active {
             display: block;
         }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .action-btn:hover {
+            background: #45a049;
+        }
         .card {
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -149,20 +169,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin: 20px 0;
-        }
-        .action-btn {
-            padding: 15px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .action-btn:hover {
-            background: #45a049;
-            transform: translateY(-2px);
         }
         .withdraw-btn {
             background: #f44336;
@@ -194,52 +200,23 @@
             border-radius: 15px;
             text-align: center;
         }
-        .stat-number {
-            font-size: 24px;
-            color: #ffd700;
-        }
         .stat-label {
             font-size: 14px;
             opacity: 0.8;
         }
-        .hidden { display: none; }
         .debug {
             color: #ff0;
             font-size: 12px;
             margin-top: 10px;
         }
+        .hidden { display: none; }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">ReviewCash</div>
-            <div class="action-buttons">
-                <button class="action-btn" onclick="sendAction('recharge')">Пополнить</button>
-                <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">Вывод</button>
-            </div>
-        </div>
+        <h1>ReviewCash</h1>
         
-        <div class="profile-section">
-            <div class="avatar">👤</div>
-            <div class="username" id="username">@YourUsername</div>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number" id="tasksCount">0</div>
-                    <div class="stat-label">Задач</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="income">0 Р</div>
-                    <div class="stat-label">Доход</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="rating">5.0</div>
-                    <div class="stat-label">Рейтинг</div>
-                </div>
-            </div>
-        </div>
-
         <div id="tasksPanel" class="panel active">
             <h2>Ваши задания</h2>
             <div id="taskList"></div>
@@ -248,14 +225,35 @@
         </div>
 
         <div id="profilePanel" class="panel">
-            <h2>Профиль</h2>
-            <div class="balance-display" id="balance">Баланс: 0 Р</div>
+            <div class="header">
+                <div class="logo">ReviewCash</div>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="sendAction('recharge')">Пополнить</button>
+                    <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">Вывод</button>
+                </div>
+            </div>
             
-            <div class="action-grid">
-                <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
-                <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
+            <div class="profile-section">
+                <div class="avatar">👤</div>
+                <div class="username" id="username">@YourUsername</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="tasksCount">0</div>
+                        <div class="stat-label">Задач</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="income">0 Р</div>
+                        <div class="stat-label">Доход</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="rating">5.0</div>
+                        <div class="stat-label">Рейтинг</div>
+                    </div>
+                </div>
             </div>
 
+            <div class="balance-display" id="balance">Баланс: 0 Р</div>
+            
             <div class="section">
                 <h3>История транзакций</h3>
                 <div class="transaction-list" id="transactionList"></div>
@@ -325,10 +323,6 @@
             }
         }
 
-        function goBack() {
-            switchTab('tasksPanel');
-        }
-
         function updatePanelVisibility() {
             if (currentRole === 'employer') {
                 document.getElementById('createTaskBtn').classList.remove('hidden');
@@ -382,4 +376,3 @@
     </script>
 </body>
 </html>
-
