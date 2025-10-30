@@ -10,48 +10,36 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: radial-gradient(circle at 20% 20%, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: #1a1a2e;
             color: #fff;
             overflow-x: hidden;
-            position: relative;
-        }
-        /* Эффект звёзд */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNkYGD4z8DAwMDAwMDP9//8PAwP///z8AAMABQCRnT7K/gAAAABJRU5ErkJggg==") repeat;
-            opacity: 0.05;
-            animation: twinkle 5s infinite alternate;
-        }
-        @keyframes twinkle {
-            from { opacity: 0.05; }
-            to { opacity: 0.15; }
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
-            z-index: 1;
+        }
+        .container {
+            flex: 1;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
         }
         h1 {
             text-align: center;
             font-size: 24px;
             margin-bottom: 20px;
+            color: #00d4ff;
+        }
+        .panel {
+            display: none;
+        }
+        .panel.active {
+            display: block;
         }
         .profile-section {
             text-align: center;
-            margin-bottom: 30px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
         }
         .avatar {
             width: 80px;
@@ -63,10 +51,11 @@
             align-items: center;
             justify-content: center;
             font-size: 40px;
+            color: #1a1a2e;
         }
         .username {
             font-size: 18px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         .stats {
             display: flex;
@@ -77,162 +66,107 @@
             text-align: center;
         }
         .stat-number {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            color: #ffd700;
+            color: #00ffcc;
         }
         .stat-label {
             font-size: 12px;
-        }
-        .tabs {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-width: 400px;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
-        }
-        .tab-button {
-            flex: 1;
-            padding: 10px;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: color 0.3s ease, transform 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .tab-button.active {
-            color: #ff6f61;
-            transform: scale(1.05);
-        }
-        .tab-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-        .panel {
-            display: none;
-            padding-bottom: 100px; /* Для места под вкладки */
-        }
-        .panel.active {
-            display: block;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
+            color: #ccc;
         }
         .action-btn {
-            padding: 8px 16px;
-            background: #4CAF50;
-            color: white;
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #00cc00;
+            color: #fff;
             border: none;
-            border-radius: 20px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
         }
         .action-btn:hover {
-            background: #45a049;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .balance-display {
-            font-size: 28px;
-            color: #ffd700;
-            margin: 20px 0;
-        }
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
+            background: #00b300;
         }
         .withdraw-btn {
-            background: #f44336;
+            background: #ff4444;
         }
         .withdraw-btn:hover {
-            background: #da190b;
+            background: #cc0000;
+        }
+        .balance-display {
+            font-size: 24px;
+            color: #00ffcc;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .transaction-list {
+            margin: 10px 0;
         }
         .transaction-item {
             display: flex;
             justify-content: space-between;
             padding: 10px;
             background: rgba(255, 255, 255, 0.1);
-            margin: 5px 0;
             border-radius: 10px;
+            margin-bottom: 5px;
         }
         .transaction-amount {
+            color: #00cc00;
             font-weight: bold;
-            color: #4CAF50;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .stat-label {
+        .tab-button {
+            background: none;
+            border: none;
+            color: #ccc;
             font-size: 14px;
-            opacity: 0.8;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        .tab-button.active {
+            color: #00d4ff;
+        }
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
         }
         .debug {
             color: #ff0;
             font-size: 12px;
             margin-top: 10px;
+            text-align: center;
         }
-        .hidden { display: none; }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
     <div class="container">
         <h1>ReviewCash</h1>
-        
+
         <div id="tasksPanel" class="panel active">
             <h2>Ваши задания</h2>
-            <div id="taskList"></div>
             <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
             <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
         </div>
 
         <div id="profilePanel" class="panel">
-            <div class="header">
-                <div class="logo">ReviewCash</div>
-                <div class="action-buttons">
-                    <button class="action-btn" onclick="sendAction('recharge')">Пополнить</button>
-                    <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">Вывод</button>
-                </div>
-            </div>
-            
             <div class="profile-section">
                 <div class="avatar">👤</div>
                 <div class="username" id="username">@YourUsername</div>
@@ -251,26 +185,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="balance-display" id="balance">Баланс: 0 Р</div>
-            
-            <div class="section">
-                <h3>История транзакций</h3>
-                <div class="transaction-list" id="transactionList"></div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="completedTasks">0</div>
-                    <div class="stat-label">Выполнено задач</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalIncome">0 Р</div>
-                    <div class="stat-label">Общий доход</div>
-                </div>
-            </div>
-
-            <button class="action-btn" onclick="sendAction('settings')">⚙️ Настройки</button>
+            <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
+            <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
+            <div class="transaction-list" id="transactionList"></div>
             <div class="debug" id="debugLog"></div>
         </div>
     </div>
@@ -291,43 +209,46 @@
         let currentRole = null;
         let userData = { balance: 0, tasks: 0, income: 0, rating: 5.0, transactions: [], username: "@YourUsername" };
 
-        console.log("Script loaded, Telegram.WebApp ready check...");
-
-        function setRole(role) {
-            currentRole = role;
-            const data = JSON.stringify({ action: "set_role", role: role });
-            Telegram.WebApp.sendData(data);
-            console.log("setRole called, sending:", data);
-            switchTab('tasksPanel');
-            updatePanelVisibility();
-            logDebug(`Role set to: ${role}`);
-        }
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM loaded, initializing Telegram.WebApp...");
+            if (Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                console.log("Telegram.WebApp initialized.");
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
+            } else {
+                console.error("Telegram.WebApp not available.");
+            }
+        });
 
         function switchTab(panelId) {
             document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
             document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`.tab-button[onclick="switchTab('${panelId}')"]`).classList.add('active');
-            updatePanelVisibility();
-            console.log(`Switched to panel: ${panelId}`);
-            logDebug(`Switched to panel: ${panelId}`);
+            console.log(`Switched to ${panelId}`);
+            logDebug(`Switched to ${panelId}`);
         }
 
         function sendAction(action) {
             if (!currentRole) {
-                console.error("No role set, cannot send action.");
-                logDebug("No role set, action not sent.");
+                console.error("No role set, action aborted.");
+                logDebug("No role set.");
                 return;
             }
             const data = JSON.stringify({ action: action, role: currentRole });
             console.log("Sending action:", action, "with data:", data);
             Telegram.WebApp.sendData(data);
-            logDebug(`Sent action: ${action}, Data: ${data}`);
-            if (action === 'recharge' || action === 'withdraw' || action === 'settings') {
-                switchTab('profilePanel');
-            } else if (action === 'create_task' || action === 'view_tasks') {
-                Telegram.WebApp.close();
-            }
+            logDebug(`Sent action: ${action}`);
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            const data = JSON.stringify({ action: "set_role", role: role });
+            Telegram.WebApp.sendData(data);
+            console.log("Set role:", role, "sending:", data);
+            logDebug(`Role set to: ${role}`);
+            updatePanelVisibility();
         }
 
         function updatePanelVisibility() {
@@ -335,17 +256,15 @@
             const viewTasksBtn = document.getElementById('viewTasksBtn');
             if (createTaskBtn && viewTasksBtn) {
                 if (currentRole === 'employer') {
-                    createTaskBtn.classList.remove('hidden');
-                    viewTasksBtn.classList.add('hidden');
+                    createTaskBtn.style.display = 'block';
+                    viewTasksBtn.style.display = 'none';
                 } else if (currentRole === 'worker') {
-                    createTaskBtn.classList.add('hidden');
-                    viewTasksBtn.classList.remove('hidden');
+                    createTaskBtn.style.display = 'none';
+                    viewTasksBtn.style.display = 'block';
                 }
-                console.log(`Panel visibility updated for role: ${currentRole}`);
             } else {
-                console.error("Button elements not found:", { createTaskBtn, viewTasksBtn });
+                console.error("Buttons not found:", { createTaskBtn, viewTasksBtn });
             }
-            updateUI();
         }
 
         function updateUI() {
@@ -353,12 +272,7 @@
             document.getElementById('tasksCount').textContent = userData.tasks;
             document.getElementById('income').textContent = `${userData.income} Р`;
             document.getElementById('rating').textContent = userData.rating;
-            document.getElementById('completedTasks').textContent = userData.tasks;
-            document.getElementById('totalIncome').textContent = `${userData.income} Р`;
-            document.getElementById('username').textContent = userData.username;
-            
-            const list = document.getElementById('transactionList');
-            list.innerHTML = userData.transactions.slice(0, 5).map(t => `
+            document.getElementById('transactionList').innerHTML = userData.transactions.map(t => `
                 <div class="transaction-item">
                     <span>${t.type}</span>
                     <span class="transaction-amount">${t.amount} Р</span>
@@ -371,16 +285,14 @@
             if (debugLog) {
                 debugLog.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
                 debugLog.scrollTop = debugLog.scrollHeight;
-            } else {
-                console.error("Debug log element not found.");
             }
         }
 
-        // Обработка обновлений от бота
+        // Обработка данных от бота
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
-            console.log("Received web_app_data:", data);
-            logDebug(`Received data: ${JSON.stringify(data)}`);
+            console.log("Received data:", data);
+            logDebug(`Received: ${JSON.stringify(data)}`);
             if (data.action === "update_profile") {
                 userData.balance = data.balance || 0;
                 userData.tasks = data.tasks_completed || 0;
@@ -388,20 +300,8 @@
                 userData.rating = data.rating || 5.0;
                 userData.transactions = data.transactions || [];
                 updateUI();
-                console.log("Profile updated:", userData);
-            }
-        });
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM fully loaded, initializing...");
-            if (Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                console.log("Telegram.WebApp initialized.");
-                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
-                console.log("Sent initial get_profile request.");
-            } else {
-                console.error("Telegram.WebApp is not available.");
+            } else if (data.action === "set_role_response") {
+                updatePanelVisibility();
             }
         });
     </script>
