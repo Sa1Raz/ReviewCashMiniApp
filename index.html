@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewCash Mini App</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; }
+        button { padding: 10px; margin: 5px; background: #0088cc; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #006bb3; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>ReviewCash</h1>
+    <div id="roleSelection">
+        <p>Выберите свою роль:</p>
+        <button onclick="setRole('employer')">👤 Работодатель</button>
+        <button onclick="setRole('worker')">🛠️ Исполнитель</button>
+    </div>
+    <div id="employerPanel" class="hidden">
+        <h2>Панель работодателя</h2>
+        <button onclick="sendAction('create_task')">📝 Создать задачу</button>
+        <button onclick="sendAction('recharge')">💸 Пополнить баланс</button>
+        <button onclick="goBack()">⬅️ Назад</button>
+    </div>
+    <div id="workerPanel" class="hidden">
+        <h2>Панель исполнителя</h2>
+        <button onclick="sendAction('view_tasks')">📋 Посмотреть задачи</button>
+        <button onclick="sendAction('withdraw')">💸 Вывести средства</button>
+        <button onclick="goBack()">⬅️ Назад</button>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        function setRole(role) {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+            showPanel(role);
+        }
+        function sendAction(action) {
+            const role = document.getElementById('employerPanel').classList.contains('hidden') ? 'worker' : 'employer';
+            Telegram.WebApp.sendData(JSON.stringify({ action: action, role: role }));
+            Telegram.WebApp.close();
+        }
+        function showPanel(role) {
+            document.getElementById('roleSelection').classList.add('hidden');
+            if (role === 'employer') document.getElementById('employerPanel').classList.remove('hidden');
+            else if (role === 'worker') document.getElementById('workerPanel').classList.remove('hidden');
+        }
+        function goBack() {
+            document.getElementById('employerPanel').classList.add('hidden');
+            document.getElementById('workerPanel').classList.add('hidden');
+            document.getElementById('roleSelection').classList.remove('hidden');
+        }
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
