@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a2a6c, #2e5cb8, #4a90e2);
+            background: linear-gradient(135deg, #0f1f4d, #2a5298, #6b8ac9);
             color: #fff;
             overflow-x: hidden;
         }
@@ -26,24 +26,80 @@
             text-align: center;
             color: #fff;
             margin-bottom: 30px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
         }
         .panel {
             flex: 1;
             display: none;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            margin-bottom: 80px;
-            animation: slideUp 0.5s ease-out;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 90px;
+            animation: fadeInUp 0.6s ease-out;
         }
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         .panel.active {
             display: block;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: #ffd700;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #0f1f4d;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .balance {
+            font-size: 28px;
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 100%;
+            background: #ff6f61;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .transaction-list {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .transaction-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
         }
         button {
             padding: 12px 25px;
@@ -55,7 +111,7 @@
             border: none;
             border-radius: 25px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         button:hover {
             background: #e65b50;
@@ -67,29 +123,6 @@
         }
         button.back:hover {
             background: #4b5563;
-        }
-        .section {
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        .balance {
-            font-size: 24px;
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .transaction-list {
-            max-height: 150px;
-            overflow-y: auto;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-        .transaction-item {
-            padding: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .tabs {
             position: fixed;
@@ -113,14 +146,20 @@
             color: #fff;
             font-size: 16px;
             cursor: pointer;
-            transition: color 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
         }
         .tab-button.active {
             color: #ff6f61;
             transform: scale(1.1);
             font-weight: bold;
+            border-bottom: 2px solid #ff6f61;
         }
         .hidden { display: none; }
+        #stats {
+            text-align: center;
+            font-size: 16px;
+            color: #b3e5fc;
+        }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
@@ -140,9 +179,12 @@
             <button class="back" onclick="goBack()">⬅️ Назад</button>
         </div>
         <div id="profilePanel" class="panel">
-            <h2>Ваш профиль</h2>
-            <div class="section">
+            <div class="profile-header">
+                <div class="avatar">👤</div>
                 <div class="balance" id="balance">Баланс: 0 Р</div>
+                <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+            </div>
+            <div class="section">
                 <button onclick="sendAction('recharge')">💸 Пополнить</button>
                 <button onclick="sendAction('withdraw')">💸 Вывести</button>
             </div>
@@ -151,12 +193,12 @@
                 <div class="transaction-list" id="transactionList"></div>
             </div>
             <div class="section">
-                <h3>Настройки</h3>
-                <button onclick="sendAction('settings')">⚙️ Изменить настройки</button>
+                <h3>Статистика</h3>
+                <div id="stats"></div>
             </div>
             <div class="section">
-                <h3>Статистика</h3>
-                <p id="stats">Задач выполнено: 0 | Доход: 0 Р</p>
+                <h3>Настройки</h3>
+                <button onclick="sendAction('settings')">⚙️ Изменить</button>
             </div>
             <button class="back" onclick="goBack()">⬅️ Назад</button>
         </div>
@@ -169,6 +211,7 @@
     <script>
         let currentRole = null;
         let transactions = [];
+        let balance = 0;
 
         function setRole(role) {
             currentRole = role;
@@ -216,17 +259,16 @@
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
             if (data.action === "update_balance") {
-                document.getElementById('balance').textContent = `Баланс: ${data.balance} Р`;
+                balance = data.balance;
+                document.getElementById('balance').textContent = `Баланс: ${balance} Р`;
+                const maxBalance = 1000; // Пример максимального баланса
+                const progress = (balance / maxBalance) * 100;
+                document.getElementById('progressBar').style.width = `${Math.min(progress, 100)}%`;
             } else if (data.action === "update_transactions") {
                 transactions = data.transactions || [];
                 const list = document.getElementById('transactionList');
                 list.innerHTML = transactions.map(t => `<div class="transaction-item">${t.type}: ${t.amount} Р (${t.date})</div>`).join('');
             } else if (data.action === "update_stats") {
-                document.getElementById('stats').textContent = `Задач выполнено: ${data.tasks} | Доход: ${data.income} Р`;
+                document.getElementById('stats').textContent = `Задач: ${data.tasks} | Доход: ${data.income} Р | Рейтинг: ${data.rating || 0}/100`;
             }
         });
-
-        Telegram.WebApp.ready();
-    </script>
-</body>
-</html>
