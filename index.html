@@ -5,52 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReviewCash Mini App</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 20px; }
-        button { padding: 10px; margin: 5px; background: #0088cc; color: white; border: none; border-radius: 5px; }
-        button:hover { background: #006bb3; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .panel {
+            display: none;
+            text-align: center;
+        }
+        .panel.active {
+            display: block;
+        }
+        button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        button.back {
+            background: #e74c3c;
+        }
+        button.back:hover {
+            background: #c0392b;
+        }
+        #profile {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+        #balance {
+            font-size: 18px;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
         .hidden { display: none; }
     </style>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
-    <h1>ReviewCash</h1>
-    <div id="roleSelection">
-        <p>Выберите свою роль:</p>
-        <button onclick="setRole('employer')">👤 Работодатель</button>
-        <button onclick="setRole('worker')">🛠️ Исполнитель</button>
-    </div>
-    <div id="employerPanel" class="hidden">
-        <h2>Панель работодателя</h2>
-        <button onclick="sendAction('create_task')">📝 Создать задачу</button>
-        <button onclick="sendAction('recharge')">💸 Пополнить баланс</button>
-        <button onclick="goBack()">⬅️ Назад</button>
-    </div>
-    <div id="workerPanel" class="hidden">
-        <h2>Панель исполнителя</h2>
-        <button onclick="sendAction('view_tasks')">📋 Посмотреть задачи</button>
-        <button onclick="sendAction('withdraw')">💸 Вывести средства</button>
-        <button onclick="goBack()">⬅️ Назад</button>
+    <div class="container">
+        <h1>ReviewCash</h1>
+        <div id="roleSelection" class="panel active">
+            <p>Выберите свою роль:</p>
+            <button onclick="setRole('employer')">👤 Работодатель</button>
+            <button onclick="setRole('worker')">🛠️ Исполнитель</button>
+        </div>
+        <div id="employerPanel" class="panel">
+            <h2>Панель работодателя</h2>
+            <button onclick="sendAction('create_task')">📝 Создать задачу</button>
+            <button onclick="showProfile()">👤 Профиль</button>
+            <button class="back" onclick="goBack()">⬅️ Назад</button>
+        </div>
+        <div id="workerPanel" class="panel">
+            <h2>Панель исполнителя</h2>
+            <button onclick="sendAction('view_tasks')">📋 Посмотреть задачи</button>
+            <button onclick="showProfile()">👤 Профиль</button>
+            <button class="back" onclick="goBack()">⬅️ Назад</button>
+        </div>
+        <div id="profile" class="hidden">
+            <h2>Ваш профиль</h2>
+            <div id="balance">Баланс: 0 Р</div>
+            <button onclick="sendAction('recharge')">💸 Пополнить баланс</button>
+            <button onclick="sendAction('withdraw')">💸 Вывести средства</button>
+            <button class="back" onclick="goBack()">⬅️ Назад</button>
+        </div>
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+        let currentBalance = 0;
+
         function setRole(role) {
             Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            showPanel(role);
+            showPanel(role === 'employer' ? 'employerPanel' : 'workerPanel');
         }
+
         function sendAction(action) {
-            const role = document.getElementById('employerPanel').classList.contains('hidden') ? 'worker' : 'employer';
+            const role = document.getElementById('employerPanel').classList.contains('active') ? 'employer' : 'worker';
             Telegram.WebApp.sendData(JSON.stringify({ action: action, role: role }));
-            Telegram.WebApp.close();
+            if (action === 'withdraw' || action === 'recharge') {
+                showProfile();
+            } else {
+                Telegram.WebApp.close();
+            }
         }
-        function showPanel(role) {
+
+        function showProfile() {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "get_balance" }));
             document.getElementById('roleSelection').classList.add('hidden');
-            if (role === 'employer') document.getElementById('employerPanel').classList.remove('hidden');
-            else if (role === 'worker') document.getElementById('workerPanel').classList.remove('hidden');
+            document.getElementById('employerPanel').classList.add('hidden');
+            document.getElementById('workerPanel').classList.add('hidden');
+            document.getElementById('profile').classList.remove('hidden');
         }
+
         function goBack() {
+            document.getElementById('profile').classList.add('hidden');
             document.getElementById('employerPanel').classList.add('hidden');
             document.getElementById('workerPanel').classList.add('hidden');
             document.getElementById('roleSelection').classList.remove('hidden');
         }
+
+        // Обновление баланса (пример, будет работать с ботом)
+        Telegram.WebApp.onEvent('web_app_data', function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "update_balance") {
+                currentBalance = data.balance;
+                document.getElementById('balance').textContent = `Баланс: ${currentBalance} Р`;
+            }
+        });
+
         Telegram.WebApp.ready();
     </script>
 </body>
