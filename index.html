@@ -7,68 +7,95 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
-            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a69bd 100%);
+            color: #fff;
+            overflow-x: hidden;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         h1 {
-            color: #2c3e50;
             text-align: center;
-            margin-bottom: 20px;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         .panel {
+            flex: 1;
             display: none;
-            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 70px;
         }
         .panel.active {
             display: block;
         }
         button {
-            padding: 12px 25px;
+            padding: 15px 30px;
             margin: 10px;
             font-size: 16px;
             cursor: pointer;
-            background: #3498db;
-            color: white;
+            background: #ff6f61;
+            color: #fff;
             border: none;
             border-radius: 25px;
-            transition: background 0.3s, transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         button:hover {
-            background: #2980b9;
-            transform: scale(1.05);
+            background: #e65b50;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
         button.back {
-            background: #e74c3c;
+            background: #6b7280;
         }
         button.back:hover {
-            background: #c0392b;
+            background: #4b5563;
         }
-        #profile {
-            margin-top: 20px;
-            padding: 15px;
-            background: #ecf0f1;
-            border-radius: 10px;
+        #profile .balance {
+            font-size: 20px;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
         }
-        #balance {
-            font-size: 18px;
-            color: #27ae60;
-            margin-bottom: 10px;
+        .tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        .tab-button.active {
+            color: #ff6f61;
+            transform: scale(1.1);
         }
         .hidden { display: none; }
     </style>
@@ -82,66 +109,74 @@
             <button onclick="setRole('employer')">👤 Работодатель</button>
             <button onclick="setRole('worker')">🛠️ Исполнитель</button>
         </div>
-        <div id="employerPanel" class="panel">
-            <h2>Панель работодателя</h2>
-            <button onclick="sendAction('create_task')">📝 Создать задачу</button>
-            <button onclick="showProfile()">👤 Профиль</button>
+        <div id="tasksPanel" class="panel">
+            <h2>Ваши задачи</h2>
+            <div id="taskList"></div>
+            <button onclick="sendAction('create_task')" class="hidden" id="createTaskBtn">📝 Создать задачу</button>
+            <button onclick="sendAction('view_tasks')" class="hidden" id="viewTasksBtn">📋 Посмотреть задачи</button>
             <button class="back" onclick="goBack()">⬅️ Назад</button>
         </div>
-        <div id="workerPanel" class="panel">
-            <h2>Панель исполнителя</h2>
-            <button onclick="sendAction('view_tasks')">📋 Посмотреть задачи</button>
-            <button onclick="showProfile()">👤 Профиль</button>
-            <button class="back" onclick="goBack()">⬅️ Назад</button>
-        </div>
-        <div id="profile" class="hidden">
+        <div id="profilePanel" class="panel">
             <h2>Ваш профиль</h2>
-            <div id="balance">Баланс: 0 Р</div>
-            <button onclick="sendAction('recharge')">💸 Пополнить баланс</button>
-            <button onclick="sendAction('withdraw')">💸 Вывести средства</button>
+            <div class="balance" id="balance">Баланс: 0 Р</div>
+            <button onclick="sendAction('recharge')">💸 Пополнить</button>
+            <button onclick="sendAction('withdraw')">💸 Вывести</button>
             <button class="back" onclick="goBack()">⬅️ Назад</button>
         </div>
     </div>
+    <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('tasksPanel')">Задания</button>
+        <button class="tab-button" onclick="switchTab('profilePanel')">Профиль</button>
+    </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        let currentBalance = 0;
+        let currentRole = null;
 
         function setRole(role) {
+            currentRole = role;
             Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            showPanel(role === 'employer' ? 'employerPanel' : 'workerPanel');
+            switchTab(role === 'employer' ? 'tasksPanel' : 'tasksPanel');
+            updatePanelVisibility();
+        }
+
+        function switchTab(panelId) {
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+            document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab-button[onclick="switchTab('${panelId}')"]`).classList.add('active');
+            updatePanelVisibility();
         }
 
         function sendAction(action) {
-            const role = document.getElementById('employerPanel').classList.contains('active') ? 'employer' : 'worker';
-            Telegram.WebApp.sendData(JSON.stringify({ action: action, role: role }));
-            if (action === 'withdraw' || action === 'recharge') {
-                showProfile();
-            } else {
-                Telegram.WebApp.close();
+            if (currentRole) {
+                Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
+                if (action === 'withdraw' || action === 'recharge') {
+                    switchTab('profilePanel');
+                } else if (action === 'create_task' || action === 'view_tasks') {
+                    Telegram.WebApp.close();
+                }
             }
         }
 
-        function showProfile() {
-            Telegram.WebApp.sendData(JSON.stringify({ action: "get_balance" }));
-            document.getElementById('roleSelection').classList.add('hidden');
-            document.getElementById('employerPanel').classList.add('hidden');
-            document.getElementById('workerPanel').classList.add('hidden');
-            document.getElementById('profile').classList.remove('hidden');
-        }
-
         function goBack() {
-            document.getElementById('profile').classList.add('hidden');
-            document.getElementById('employerPanel').classList.add('hidden');
-            document.getElementById('workerPanel').classList.add('hidden');
-            document.getElementById('roleSelection').classList.remove('hidden');
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            document.getElementById('roleSelection').classList.add('active');
+            document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
         }
 
-        // Обновление баланса (пример, будет работать с ботом)
+        function updatePanelVisibility() {
+            document.getElementById('createTaskBtn').classList.toggle('hidden', currentRole !== 'employer');
+            document.getElementById('viewTasksBtn').classList.toggle('hidden', currentRole !== 'worker');
+            if (currentRole) {
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_balance" }));
+            }
+        }
+
+        // Обновление баланса
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
             if (data.action === "update_balance") {
-                currentBalance = data.balance;
-                document.getElementById('balance').textContent = `Баланс: ${currentBalance} Р`;
+                document.getElementById('balance').textContent = `Баланс: ${data.balance} Р`;
             }
         });
 
