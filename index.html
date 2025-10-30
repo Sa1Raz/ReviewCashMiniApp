@@ -10,141 +10,128 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #fff;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
+            position: relative;
+        }
+        /* Космос с звёздами */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNkYGD4z8DAwMDAwMDP9//8PAwP///z8AAMABQCRnT7K/gAAAABJRU5ErkJggg==") repeat;
+            opacity: 0.1;
+            animation: twinkle 10s infinite alternate;
+        }
+        @keyframes twinkle {
+            from { opacity: 0.1; }
+            to { opacity: 0.2; }
         }
         .container {
-            flex: 1;
-            padding: 20px;
             max-width: 400px;
             margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
         h1 {
             text-align: center;
             font-size: 28px;
             margin-bottom: 30px;
             color: #00d4ff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .role-selection {
-            text-align: center;
-            margin-bottom: 30px;
-            display: none;
-        }
-        .role-selection.active {
-            display: block;
-        }
-        .role-btn {
-            display: block;
-            width: 100%;
-            padding: 20px;
-            margin: 15px 0;
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .role-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-        .role-btn.worker {
-            background: linear-gradient(90deg, #2196F3, #1976D2);
-        }
-        .role-btn.worker:hover {
-            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
-        }
-        .role-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-        .main-app {
-            display: none;
-        }
-        .main-app.active {
-            display: block;
-        }
-        .tabs {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .tab-button {
-            background: none;
-            border: none;
-            color: #ccc;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 5px;
-            transition: color 0.3s;
-        }
-        .tab-button.active {
-            color: #00d4ff;
-        }
-        .tab-icon {
-            font-size: 20px;
-            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3);
         }
         .panel {
+            flex: 1;
             display: none;
+            padding-bottom: 80px;
         }
         .panel.active {
             display: block;
         }
-        .card {
+        .profile-section {
+            text-align: center;
+            padding: 20px;
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
         }
-        .balance {
-            font-size: 26px;
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .username {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #ccc;
+        }
+        .balance-display {
+            font-size: 28px;
             color: #ffd700;
             text-align: center;
             margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
         }
         .action-btn {
             display: block;
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             margin: 10px 0;
             background: linear-gradient(90deg, #00cc00, #009900);
             color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 204, 0, 0.3);
+            transition: all 0.3s ease;
         }
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 204, 0, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 204, 0, 0.4);
         }
         .withdraw-btn {
             background: linear-gradient(90deg, #ff4444, #cc0000);
         }
         .withdraw-btn:hover {
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+            box-shadow: 0 8px 20px rgba(255, 68, 68, 0.4);
+        }
+        .transaction-list {
+            margin: 10px 0;
         }
         .transaction-item {
             display: flex;
@@ -158,39 +145,79 @@
             color: #00cc00;
             font-weight: bold;
         }
+        .tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        .tab-button.active {
+            color: #00d4ff;
+            transform: scale(1.1);
+        }
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 <body>
     <div class="container">
-        <!-- Экран выбора роли -->
-        <div id="roleSelection" class="role-selection">
-            <h1>Выберите роль</h1>
-            <button class="role-btn" onclick="setRole('employer')">
-                <span class="role-icon">👤</span> Работодатель
-            </button>
-            <button class="role-btn worker" onclick="setRole('worker')">
-                <span class="role-icon">🛠️</span> Исполнитель
-            </button>
+        <h1>ReviewCash</h1>
+
+        <div id="tasksPanel" class="panel active">
+            <h2>Ваши задания</h2>
+            <div id="taskList"></div>
+            <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
+            <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
         </div>
 
-        <!-- Основной интерфейс -->
-        <div id="mainApp" class="main-app">
-            <div id="tasksPanel" class="panel active">
-                <h2>Задания</h2>
-                <div id="taskList"></div>
-                <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
-                <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
+        <div id="profilePanel" class="panel">
+            <div class="profile-section">
+                <div class="avatar" id="avatar"><img src="" alt="Avatar"></div>
+                <div class="username" id="username">@YourUsername</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="tasksCount">0</div>
+                        <div class="stat-label">Задач</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="income">0 Р</div>
+                        <div class="stat-label">Доход</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="rating">5.0</div>
+                        <div class="stat-label">Рейтинг</div>
+                    </div>
+                </div>
             </div>
-
-            <div id="profilePanel" class="panel">
-                <h2>Профиль</h2>
-                <div class="balance" id="balance">Баланс: 0 Р</div>
-                <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
-                <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
-                <button class="action-btn" onclick="showRoleSelection()">🔄 Сменить роль</button>
-                <div class="transaction-list" id="transactionList"></div>
-            </div>
+            <div class="balance-display" id="balance">Баланс: 0 Р</div>
+            <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
+            <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
+            <button class="action-btn" onclick="showRoleSelection()">🔄 Сменить роль</button>
+            <div class="transaction-list" id="transactionList"></div>
         </div>
     </div>
 
@@ -208,40 +235,23 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let currentRole = null;
+        let userData = { balance: 0, tasks: 0, income: 0, rating: 5.0, transactions: [], username: "@YourUsername" };
 
-        // Проверка роли при загрузке
+        // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.sendData(JSON.stringify({ action: "get_role" }));
-        });
-
-        // Обработка данных от бота
-        Telegram.WebApp.onEvent('web_app_data', function(event) {
-            const data = JSON.parse(event.data);
-            if (data.action === "set_role_response" || data.action === "get_role_response") {
-                currentRole = data.role;
-                if (currentRole) {
-                    document.getElementById('roleSelection').classList.remove('active');
-                    document.getElementById('mainApp').classList.add('active');
-                    updatePanelVisibility();
-                } else {
-                    document.getElementById('roleSelection').classList.add('active');
+            if (Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                if (user) {
+                    document.getElementById('username').textContent = user.username || `@${user.id}`;
+                    const avatarUrl = user.photo_url || '';
+                    if (avatarUrl) {
+                        document.getElementById('avatar').querySelector('img').src = avatarUrl;
+                    }
                 }
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
             }
         });
-
-        function setRole(role) {
-            currentRole = role;
-            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            document.getElementById('roleSelection').classList.remove('active');
-            document.getElementById('mainApp').classList.add('active');
-            updatePanelVisibility();
-        }
-
-        function showRoleSelection() {
-            document.getElementById('mainApp').classList.remove('active');
-            document.getElementById('roleSelection').classList.add('active');
-        }
 
         function switchTab(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -258,7 +268,20 @@
             Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
             if (action === 'recharge' || action === 'withdraw') {
                 switchTab('profilePanel');
+            } else if (action === 'create_task' || action === 'view_tasks') {
+                switchTab('tasksPanel');
             }
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
+            updatePanelVisibility();
+        }
+
+        function showRoleSelection() {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "show_role_selection" }));
+            switchTab('tasksPanel');
         }
 
         function updatePanelVisibility() {
@@ -274,6 +297,39 @@
                 }
             }
         }
+
+        function updateUI(data) {
+            userData.balance = data.balance || 0;
+            userData.tasks = data.tasks_completed || 0;
+            userData.income = data.income || 0;
+            userData.rating = data.rating || 5.0;
+            userData.transactions = data.transactions || [];
+
+            document.getElementById('balance').textContent = `Баланс: ${userData.balance} Р`;
+            document.getElementById('tasksCount').textContent = userData.tasks;
+            document.getElementById('income').textContent = `${userData.income} Р`;
+            document.getElementById('rating').textContent = userData.rating;
+            document.getElementById('transactionList').innerHTML = userData.transactions.map(t => `
+                <div class="transaction-item">
+                    <span>${t.type}</span>
+                    <span class="transaction-amount">${t.amount} Р</span>
+                </div>
+            `).join('');
+        }
+
+        // Обработка данных от бота
+        Telegram.WebApp.onEvent('web_app_data', function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === "update_profile") {
+                updateUI(data);
+            } else if (data.action === "set_role_response") {
+                updatePanelVisibility();
+            } else if (data.action === "task_created") {
+                alert("Задача создана!");
+            } else if (data.action === "task_completed") {
+                alert("Задача выполнена! Средства зачислены.");
+            }
+        });
     </script>
 </body>
 </html>
