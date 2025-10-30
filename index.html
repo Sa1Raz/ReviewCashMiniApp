@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #4a69bd 100%);
+            background: linear-gradient(135deg, #1a2a6c, #2e5cb8, #4a90e2);
             color: #fff;
             overflow-x: hidden;
         }
@@ -26,23 +26,28 @@
             text-align: center;
             color: #fff;
             margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
         }
         .panel {
             flex: 1;
             display: none;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            margin-bottom: 70px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 80px;
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .panel.active {
             display: block;
         }
         button {
-            padding: 15px 30px;
-            margin: 10px;
+            padding: 12px 25px;
+            margin: 8px;
             font-size: 16px;
             cursor: pointer;
             background: #ff6f61;
@@ -50,12 +55,12 @@
             border: none;
             border-radius: 25px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         button:hover {
             background: #e65b50;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         button.back {
             background: #6b7280;
@@ -63,11 +68,28 @@
         button.back:hover {
             background: #4b5563;
         }
-        #profile .balance {
-            font-size: 20px;
+        .section {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .balance {
+            font-size: 24px;
             color: #ffd700;
-            margin-bottom: 20px;
             text-align: center;
+            margin-bottom: 20px;
+        }
+        .transaction-list {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .transaction-item {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .tabs {
             position: fixed;
@@ -75,13 +97,13 @@
             left: 0;
             width: 100%;
             max-width: 600px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            padding: 12px 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
         }
         .tab-button {
             flex: 1;
@@ -96,6 +118,7 @@
         .tab-button.active {
             color: #ff6f61;
             transform: scale(1.1);
+            font-weight: bold;
         }
         .hidden { display: none; }
     </style>
@@ -118,9 +141,23 @@
         </div>
         <div id="profilePanel" class="panel">
             <h2>Ваш профиль</h2>
-            <div class="balance" id="balance">Баланс: 0 Р</div>
-            <button onclick="sendAction('recharge')">💸 Пополнить</button>
-            <button onclick="sendAction('withdraw')">💸 Вывести</button>
+            <div class="section">
+                <div class="balance" id="balance">Баланс: 0 Р</div>
+                <button onclick="sendAction('recharge')">💸 Пополнить</button>
+                <button onclick="sendAction('withdraw')">💸 Вывести</button>
+            </div>
+            <div class="section">
+                <h3>История транзакций</h3>
+                <div class="transaction-list" id="transactionList"></div>
+            </div>
+            <div class="section">
+                <h3>Настройки</h3>
+                <button onclick="sendAction('settings')">⚙️ Изменить настройки</button>
+            </div>
+            <div class="section">
+                <h3>Статистика</h3>
+                <p id="stats">Задач выполнено: 0 | Доход: 0 Р</p>
+            </div>
             <button class="back" onclick="goBack()">⬅️ Назад</button>
         </div>
     </div>
@@ -131,11 +168,12 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let currentRole = null;
+        let transactions = [];
 
         function setRole(role) {
             currentRole = role;
             Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
-            switchTab(role === 'employer' ? 'tasksPanel' : 'tasksPanel');
+            switchTab('tasksPanel');
             updatePanelVisibility();
         }
 
@@ -150,7 +188,7 @@
         function sendAction(action) {
             if (currentRole) {
                 Telegram.WebApp.sendData(JSON.stringify({ action: action, role: currentRole }));
-                if (action === 'withdraw' || action === 'recharge') {
+                if (action === 'withdraw' || action === 'recharge' || action === 'settings') {
                     switchTab('profilePanel');
                 } else if (action === 'create_task' || action === 'view_tasks') {
                     Telegram.WebApp.close();
@@ -169,14 +207,22 @@
             document.getElementById('viewTasksBtn').classList.toggle('hidden', currentRole !== 'worker');
             if (currentRole) {
                 Telegram.WebApp.sendData(JSON.stringify({ action: "get_balance" }));
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_transactions" }));
+                Telegram.WebApp.sendData(JSON.stringify({ action: "get_stats" }));
             }
         }
 
-        // Обновление баланса
+        // Обновление данных
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
             if (data.action === "update_balance") {
                 document.getElementById('balance').textContent = `Баланс: ${data.balance} Р`;
+            } else if (data.action === "update_transactions") {
+                transactions = data.transactions || [];
+                const list = document.getElementById('transactionList');
+                list.innerHTML = transactions.map(t => `<div class="transaction-item">${t.type}: ${t.amount} Р (${t.date})</div>`).join('');
+            } else if (data.action === "update_stats") {
+                document.getElementById('stats').textContent = `Задач выполнено: ${data.tasks} | Доход: ${data.income} Р`;
             }
         });
 
