@@ -44,14 +44,15 @@
         .avatar {
             width: 80px;
             height: 80px;
-            background: #fff;
             border-radius: 50%;
             margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: #1a1a2e;
+            background: #fff;
+            overflow: hidden;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .username {
             font-size: 18px;
@@ -79,22 +80,31 @@
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            background: #00cc00;
+            background: linear-gradient(90deg, #00cc00, #009900);
             color: #fff;
             border: none;
             border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 204, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         .action-btn:hover {
-            background: #00b300;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 204, 0, 0.4);
+        }
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 204, 0, 0.2);
         }
         .withdraw-btn {
-            background: #ff4444;
+            background: linear-gradient(90deg, #ff4444, #cc0000);
         }
         .withdraw-btn:hover {
-            background: #cc0000;
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+        }
+        .withdraw-btn:active {
+            box-shadow: 0 2px 10px rgba(255, 68, 68, 0.2);
         }
         .balance-display {
             font-size: 24px;
@@ -147,12 +157,6 @@
             font-size: 20px;
             margin-bottom: 5px;
         }
-        .debug {
-            color: #ff0;
-            font-size: 12px;
-            margin-top: 10px;
-            text-align: center;
-        }
     </style>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
@@ -162,13 +166,14 @@
 
         <div id="tasksPanel" class="panel active">
             <h2>Ваши задания</h2>
+            <div id="taskList"></div>
             <button class="action-btn" id="createTaskBtn" onclick="sendAction('create_task')">📝 Создать задачу</button>
             <button class="action-btn" id="viewTasksBtn" onclick="sendAction('view_tasks')">📋 Все задания</button>
         </div>
 
         <div id="profilePanel" class="panel">
             <div class="profile-section">
-                <div class="avatar">👤</div>
+                <div class="avatar" id="avatar"><img src="" alt="Avatar"></div>
                 <div class="username" id="username">@YourUsername</div>
                 <div class="stats">
                     <div class="stat-item">
@@ -189,7 +194,6 @@
             <button class="action-btn" onclick="sendAction('recharge')">💸 Пополнить</button>
             <button class="action-btn withdraw-btn" onclick="sendAction('withdraw')">💸 Вывести</button>
             <div class="transaction-list" id="transactionList"></div>
-            <div class="debug" id="debugLog"></div>
         </div>
     </div>
 
@@ -211,13 +215,17 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM loaded, initializing Telegram.WebApp...");
             if (Telegram.WebApp) {
                 Telegram.WebApp.ready();
-                console.log("Telegram.WebApp initialized.");
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                if (user) {
+                    document.getElementById('username').textContent = user.username || `@${user.id}`;
+                    const avatarUrl = user.photo_url || '';
+                    if (avatarUrl) {
+                        document.getElementById('avatar').querySelector('img').src = avatarUrl;
+                    }
+                }
                 Telegram.WebApp.sendData(JSON.stringify({ action: "get_profile" }));
-            } else {
-                console.error("Telegram.WebApp not available.");
             }
         });
 
@@ -226,28 +234,25 @@
             document.getElementById(panelId).classList.add('active');
             document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`.tab-button[onclick="switchTab('${panelId}')"]`).classList.add('active');
-            console.log(`Switched to ${panelId}`);
-            logDebug(`Switched to ${panelId}`);
         }
 
         function sendAction(action) {
             if (!currentRole) {
-                console.error("No role set, action aborted.");
-                logDebug("No role set.");
+                alert("Сначала выберите роль!");
                 return;
             }
             const data = JSON.stringify({ action: action, role: currentRole });
-            console.log("Sending action:", action, "with data:", data);
             Telegram.WebApp.sendData(data);
-            logDebug(`Sent action: ${action}`);
+            if (action === 'recharge' || action === 'withdraw') {
+                switchTab('profilePanel');
+            } else if (action === 'create_task' || action === 'view_tasks') {
+                switchTab('tasksPanel');
+            }
         }
 
         function setRole(role) {
             currentRole = role;
-            const data = JSON.stringify({ action: "set_role", role: role });
-            Telegram.WebApp.sendData(data);
-            console.log("Set role:", role, "sending:", data);
-            logDebug(`Role set to: ${role}`);
+            Telegram.WebApp.sendData(JSON.stringify({ action: "set_role", role: role }));
             updatePanelVisibility();
         }
 
@@ -262,12 +267,16 @@
                     createTaskBtn.style.display = 'none';
                     viewTasksBtn.style.display = 'block';
                 }
-            } else {
-                console.error("Buttons not found:", { createTaskBtn, viewTasksBtn });
             }
         }
 
-        function updateUI() {
+        function updateUI(data) {
+            userData.balance = data.balance || 0;
+            userData.tasks = data.tasks_completed || 0;
+            userData.income = data.income || 0;
+            userData.rating = data.rating || 5.0;
+            userData.transactions = data.transactions || [];
+
             document.getElementById('balance').textContent = `Баланс: ${userData.balance} Р`;
             document.getElementById('tasksCount').textContent = userData.tasks;
             document.getElementById('income').textContent = `${userData.income} Р`;
@@ -280,28 +289,17 @@
             `).join('');
         }
 
-        function logDebug(message) {
-            const debugLog = document.getElementById('debugLog');
-            if (debugLog) {
-                debugLog.innerHTML += `<p>${new Date().toLocaleTimeString()}: ${message}</p>`;
-                debugLog.scrollTop = debugLog.scrollHeight;
-            }
-        }
-
         // Обработка данных от бота
         Telegram.WebApp.onEvent('web_app_data', function(event) {
             const data = JSON.parse(event.data);
-            console.log("Received data:", data);
-            logDebug(`Received: ${JSON.stringify(data)}`);
             if (data.action === "update_profile") {
-                userData.balance = data.balance || 0;
-                userData.tasks = data.tasks_completed || 0;
-                userData.income = data.income || 0;
-                userData.rating = data.rating || 5.0;
-                userData.transactions = data.transactions || [];
-                updateUI();
+                updateUI(data);
             } else if (data.action === "set_role_response") {
                 updatePanelVisibility();
+            } else if (data.action === "task_created") {
+                alert("Задача создана!");
+            } else if (data.action === "task_completed") {
+                alert("Задача выполнена! Средства зачислены.");
             }
         });
     </script>
