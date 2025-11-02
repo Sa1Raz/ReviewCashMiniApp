@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель работодателя</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .container {
+            background: #2d2d44;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        h1 {
+            color: #00c4cc;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .balance {
+            background: #3a3a5c;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            animation: fadeIn 0.5s ease-in;
+        }
+        button {
+            background: linear-gradient(45deg, #00c4cc, #007bff);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 90%;
+            margin: 10px 0;
+            font-size: 1em;
+            transition: transform 0.2s, background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #007bff, #00c4cc);
+        }
+        button i {
+            margin-right: 8px;
+        }
+        #taskForm {
+            display: none;
+            text-align: left;
+            animation: slideIn 0.5s ease-out;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #00c4cc;
+            border-radius: 5px;
+            background: #3a3a5c;
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-buttons button {
+            width: 48%;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 Панель работодателя</h1>
+        <div class="balance">
+            <p>💰 Ваш баланс: <span id="balance">0 Р</span></p>
+        </div>
+        <button onclick="createTask()"><i class="fas fa-plus"></i> 📝 Создать задание</button>
+        <button onclick="rechargeBalance()"><i class="fas fa-wallet"></i> 💸 Пополнить баланс</button>
+        <button onclick="exit()"><i class="fas fa-sign-out-alt"></i> ⬅️ Выйти</button>
+
+        <div id="taskForm">
+            <input type="text" id="niche" placeholder="Ниша (2ГИС/Google/Telegram)" required>
+            <input type="text" id="title" placeholder="Название задания" required>
+            <input type="number" id="cost" placeholder="Стоимость (руб)" min="1" required>
+            <div class="form-buttons">
+                <button onclick="submitTask()"><i class="fas fa-paper-plane"></i> Отправить</button>
+                <button onclick="cancelTask()"><i class="fas fa-times"></i> Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userId = Telegram.WebApp.initDataUnsafe.user?.id || 0;
+        let initData = Telegram.WebApp.initData;
+
+        function loadBalance() {
+            fetch(`/api/balance?init_data=${encodeURIComponent(initData)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    document.getElementById('balance').textContent = `${data.balance} Р`;
+                }).catch(error => alert(`Ошибка: ${error.message}`));
+        }
+
+        function rechargeBalance() {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "recharge", user_id: userId, amount: 100 }));
+            Telegram.WebApp.close();
+        }
+
+        function createTask() {
+            document.getElementById('taskForm').style.display = 'block';
+        }
+
+        function submitTask() {
+            const niche = document.getElementById('niche').value;
+            const title = document.getElementById('title').value;
+            const cost = document.getElementById('cost').value;
+            fetch('/api/create_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Telegram-Init-Data': initData
+                },
+                body: JSON.stringify({ user_id: userId, niche, title, cost })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      alert('Задание создано!');
+                      document.getElementById('taskForm').style.display = 'none';
+                      loadBalance();
+                  }
+              }).catch(error => alert(`Ошибка: ${error}`));
+        }
+
+        function cancelTask() {
+            document.getElementById('taskForm').style.display = 'none';
+        }
+
+        function exit() {
+            Telegram.WebApp.sendData(JSON.stringify({ action: "exit" }));
+            Telegram.WebApp.close();
+        }
+
+        loadBalance();
+    </script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body>
+</html>
