@@ -1,0 +1,27 @@
+# Секреты и настройки
+.env
+.env.local
+config.py
+
+# База данных
+*.db
+*.sqlite3
+
+# Python кэш
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Логи
+*.log
+
+# IDE / редакторы
+.idea/
+.vscode/
+*.sublime-workspace

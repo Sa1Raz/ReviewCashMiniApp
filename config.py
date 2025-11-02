@@ -1,0 +1,8 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+TOKEN = os.getenv('BOT_TOKEN')
+ADMIN_ID = int(os.getenv('ADMIN_ID'))
+WEBAPP_URL = os.getenv('WEBAPP_URL')  # Например, https://your-ngrok-url.ngrok-free.dev
